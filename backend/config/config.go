@@ -7,19 +7,20 @@ import (
 )
 
 type Config struct {
-	Port    string
-	AppName string
-	Env     string
+	Port        string
+	AppName     string
+	Env         string
+	DatabaseUrl string
 }
 
 func LoadConfig() Config {
-	// Load .env (ignore error in production)
 	_ = godotenv.Load()
 
 	return Config{
-		Port:    getEnv("PORT", "8000"),
-		AppName: getEnv("APP_NAME", "LineUp"),
-		Env:     getEnv("ENV", "development"),
+		Port:        getEnv("PORT", "8000"),
+		AppName:     getEnv("APP_NAME", "LineUp"),
+		Env:         getEnv("ENV", "development"),
+		DatabaseUrl: getEnv("DATABASE_URL", ""),
 	}
 }
 
