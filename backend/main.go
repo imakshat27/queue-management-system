@@ -12,10 +12,12 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
-func main() {
+var app *fiber.App
+
+func setupApp() *fiber.App {
 	cfg := config.LoadConfig()
 
-	app := fiber.New(fiber.Config{
+	app = fiber.New(fiber.Config{
 		AppName: cfg.AppName,
 	})
 
@@ -25,11 +27,9 @@ func main() {
 		&models.User{},
 	)
 
-	// Global Middlewares
 	app.Use(logger.New())
 	app.Use(recover.New())
 
-	// Health check
 	app.Get("/health", func(c *fiber.Ctx) error {
 		return common.Respond(c, fiber.StatusOK, true, "API is healthy", nil)
 	})
@@ -44,6 +44,22 @@ func main() {
 		)
 	})
 
+	return app
+}
+
+func main() {
+	cfg := config.LoadConfig()
+
+	app := setupApp()
+
 	log.Println("Server running on http://localhost:" + cfg.Port)
 	log.Fatal(app.Listen(":" + cfg.Port))
+}
+
+func Handler(c *fiber.Ctx) error {
+	if app == nil {
+		setupApp()
+	}
+	app.Handler()(c.Context())
+	return nil
 }
