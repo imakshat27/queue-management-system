@@ -1,0 +1,25 @@
+# ======== Backend (Go) ========
+bin
+tmp
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go build output (if you ever build a binary)
+app
+
+# Environment variables (VERY IMPORTANT)
+.env
+.env.local
+.env.dev
+.env.prod
+
+# IDE / editor
+.vscode/
+.idea/
+
+# OS junk
+.DS_Store
+Thumbs.db
