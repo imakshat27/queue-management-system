@@ -1,28 +1,20 @@
-package handler
+package main
 
 import (
 	"log"
-	"net/http"
 
 	"github.com/chirayusahu/queue-management-system/backend/common"
 	"github.com/chirayusahu/queue-management-system/backend/config"
 	"github.com/chirayusahu/queue-management-system/backend/database"
 	"github.com/chirayusahu/queue-management-system/backend/models"
-
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/adaptor"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
 var app *fiber.App
 
-// Build the app once (cold start)
 func setupApp() *fiber.App {
-	if app != nil {
-		return app
-	}
-
 	cfg := config.LoadConfig()
 
 	app = fiber.New(fiber.Config{
@@ -30,13 +22,16 @@ func setupApp() *fiber.App {
 	})
 
 	database.Connect(cfg.DatabaseUrl)
-	database.DB.AutoMigrate(&models.User{})
+
+	database.DB.AutoMigrate(
+		&models.User{},
+	)
 
 	app.Use(logger.New())
 	app.Use(recover.New())
 
 	app.Get("/health", func(c *fiber.Ctx) error {
-		return common.Respond(c, 200, true, "API is healthy", nil)
+		return common.Respond(c, fiber.StatusOK, true, "API is healthy", nil)
 	})
 
 	app.All("*", func(c *fiber.Ctx) error {
@@ -49,14 +44,22 @@ func setupApp() *fiber.App {
 		)
 	})
 
-	log.Println("Fiber app initialized (Vercel)")
 	return app
 }
 
-func Handler(w http.ResponseWriter, r *http.Request) {
-	r.RequestURI = r.URL.String()
+func main() {
+	cfg := config.LoadConfig()
 
 	app := setupApp()
 
-	adaptor.FiberApp(app).ServeHTTP(w, r)
+	log.Println("Server running on http://localhost:" + cfg.Port)
+	log.Fatal(app.Listen(":" + cfg.Port))
+}
+
+func Handler(c *fiber.Ctx) error {
+	if app == nil {
+		setupApp()
+	}
+	app.Handler()(c.Context())
+	return nil
 }
