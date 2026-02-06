@@ -1,4 +1,4 @@
-package main
+package handler
 
 import (
 	"log"
@@ -17,6 +17,7 @@ import (
 
 var app *fiber.App
 
+// Build the app once (cold start)
 func setupApp() *fiber.App {
 	if app != nil {
 		return app
@@ -48,7 +49,7 @@ func setupApp() *fiber.App {
 		)
 	})
 
-	log.Println("Fiber app initialized")
+	log.Println("Fiber app initialized (Vercel)")
 	return app
 }
 
