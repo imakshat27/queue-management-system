@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/chirayusahu/queue-management-system/backend/routes"
 )
 
 var app *fiber.App
@@ -29,6 +30,7 @@ func setupApp() *fiber.App {
 
 	app.Use(logger.New())
 	app.Use(recover.New())
+	routes.V1Routes(app)
 
 	app.Get("/health", func(c *fiber.Ctx) error {
 		return common.Respond(c, fiber.StatusOK, true, "API is healthy", nil)
